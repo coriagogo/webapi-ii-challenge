@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     try {
         const post = req.body;
 
-        if(!post.title|| !post.contents){
+        if(!post.title || !post.contents){
             return res.status(400).json({
                 message: 'Error, please provide title and contents for post.'
             })
@@ -59,28 +59,38 @@ router.delete('/:id', async (req, res) => {
         if (count > 0) {
             res.status(200).json ({ message: 'The post has been removed'});
         } else {
-            res.status(404).json({ message: 'The post could not found' })
+            res.status(404).json({ message: 'The post with the specified ID does not exist.' })
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: 'Error removing the post',
+            message: 'The post could not be removed.',
         });
     }
 });
 
 router.put('/:id', async (req, res) => {
     try {
-        const post = await Posts.update(req.params.id, req.body);
-        if (post) {
-            res.status(200).json(post);
-        } else {
-            res.status(404).json({ message: 'The post could not be found' });
+        const post = req.body;
+        const { id } = req.params;
+
+        if (!post.title || !post.contents) {
+            return res.status(400).json({
+                message: 'Error, please provide title and contents for posts update.'
+            })
+        } else if (!id) {
+            res
+            .status(404).json({
+                message: 'The post with the specified ID could not be found.'
+            });
         }
+
+        const updatePost = await Posts.update(req.params.id, req.body);
+        return res.status(201).json(updatePost);        
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: 'Error updating the post',
+            message: 'The post information could not be modified.',
         });
     }
 });
